@@ -1,0 +1,385 @@
+﻿@{
+    ViewBag.Title = "Proyectos";
+}
+<script type="text/javascript" src="~/Scripts/jquery-3.4.1.min.js"></script>
+
+
+
+
+
+
+
+<style>
+    #carouselExampleIndicators {
+        height: 550px;
+        width: 400px;
+    }
+
+    #carousel img {
+        height: 550px;
+        width: 400px;
+    }
+</style>
+
+<h1 style="text-align:center;">Proyectos</h1>
+<div class="d-flex">
+    <label style="padding:0.5%;">Tipos:</label><select id="cbTipos" onchange="CardsTipos();" class="form-control" style="width:50%;"></select><button class="btn btn-primary" style="margin-left:2%;" onclick="Nueva();" id="btnNuevaPublicacion">Nueva publicación</button>
+</div>
+
+
+<div class="row row-cols-1 row-cols-md-3 g-4 p-4" id="ContenedorCards">
+
+</div>
+
+
+
+<!--Modal Ver Detalle-->
+<div class="modal" tabindex="-1" id="modalDetalles">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dTitulo">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="dDescripcion">Modal body text goes here.</p>
+
+                <div id="carouselExampleIndicators" class="carousel slide d-block w-100" data-bs-ride="carousel">
+
+                    <ol class="carousel-indicators" id="carouselIndicators">
+                    </ol>
+
+                    <div class="carousel-inner" id="carousel">
+
+                    </div>
+
+                    <div id="dAnteriorSiguiente">
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal Nueva Publicación-->
+
+<div class="modal fade" id="modalNueva" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nueva publicación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBodyNueva">
+                <form enctype="multipart/form-data">
+                    <label>Título:</label><input type="text" class="form-control" id="txtTituloNuevo" />
+                    <label>Descripción:</label><textarea class="form-control" id="txtDescripcionNuevo"></textarea>
+                    <label>Imagenes:</label><input multiple type="file" class="form-control" id="txtImagenNuevo" />
+                    <label>Tipo:</label><select id="cbTiposNuevo" class="form-control"></select>
+                </form>
+
+                <div id="contenedorToastNueva">
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar();">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal Modificar Publicación-->
+
+<div class="modal fade" id="modalModificar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modificar publicación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data">
+                    <label>Título:</label><input type="text" class="form-control" id="txtTituloModificar" />
+                    <label>Descripción:</label><textarea class="form-control" id="txtDescripcionModificar"></textarea>
+                    <label>Imagenes:</label><input multiple type="file" class="form-control" id="txtImagenModificar" />
+                    <label>Tipo:</label><select id="cbTiposModificar" class="form-control"></select>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary">Modificar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+var url = 'https://localhost:44357';
+    //var url = 'http://practicaraplicaciones.somee.com';
+    window.onload = CargarPagina();
+    function CargarPagina() {
+        CbTipos(0);
+        ValidarBotonPublicacion();
+
+    }
+
+    function ValidarBotonPublicacion() {
+        var id = sessionStorage.getItem('Id');
+        if (id == null) {
+            document.getElementById('btnNuevaPublicacion').style.display = 'none';
+        }
+    }
+
+    function CbTipos(cbCargar) {
+        const xhttp = new XMLHttpRequest();
+        xhttp.open('GET', url + '/Tipo/ListaTipos', true);
+        //xhttp.open('GET', '/Alumno/ListaModificarAlumno?TextoBuscar=' + textoBuscar, true);
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                let d = JSON.parse(this.responseText);
+                let tipos;
+                switch (cbCargar) {
+                    case 0:
+                        tipos = document.querySelector('#cbTipos');
+                        tipos.innerHTML = '';
+                        tipos.innerHTML = '<option disabled="true" selected>Seleccionar</option>';
+                        break;
+                    case 1:
+                        tipos = document.querySelector('#cbTiposNuevo');
+                        tipos.innerHTML = '';
+                        tipos.innerHTML = '<option disabled="true" selected>Seleccionar</option>';
+                        break;
+                    case 2:
+                        tipos = document.querySelector('#cbTiposModificar');
+                        tipos.innerHTML = '';
+                        tipos.innerHTML = '<option disabled="true">Seleccionar</option>';
+                        break;
+                }
+
+                for (let item of d) {
+                    tipos.innerHTML += '<option value="' + item.Id + '">' + item.Nombre + '</option>';
+                }
+            }
+        }
+    }
+
+
+    function LimpiarModalNueva(){
+        document.getElementById('txtTituloNuevo').value = '';
+        document.getElementById('txtDescripcionNuevo').value = '';
+        document.getElementById('txtImagenNuevo').value = null;
+        document.getElementById('cbTiposModificar').value = null;
+
+        document.getElementById('txtTituloNuevo').focus();
+    }
+
+    function Nueva() {
+
+        var myModal = new bootstrap.Modal(document.getElementById('modalNueva'), {});
+        CbTipos(1);
+        LimpiarModalNueva();
+        myModal.show();
+    }
+    function Guardar() {
+        var input = document.getElementById('txtImagenNuevo').files;
+
+        if (input.size > 1048576) {
+            alert("El archivo pesa mas de 1 mb");
+            //Swal.fire({
+            //    icon: 'warning',
+            //    title: "El archivo pesa mas de 1 mb.",
+            //    showConfirmButton: false,
+            //    timer: 1500
+            //});
+            return;
+        }
+        var formData = new FormData();
+        $.each(input, function (i, files) {
+            formData.append('Files', files);
+        });
+        formData.append("Titulo", document.getElementById("txtTituloNuevo").value);
+        formData.append("Descripcion", document.getElementById("txtDescripcionNuevo").value);
+        formData.append("IdTipo", document.getElementById("cbTiposNuevo").value);
+
+        const http = new XMLHttpRequest();
+        http.open('POST', url + '/Publicacion/Guardar');
+        http.send(formData);
+        http.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var respuesta = this.responseText;
+                //let guardadoBodyNuevo = document.querySelector('#guardadoBodyNuevo');
+                if (respuesta == 'Ok') {
+
+                    var contenedorToastNueva = document.getElementById('contenedorToastNueva');
+
+                    contenedorToastNueva.innerHTML = '';
+
+                    contenedorToastNueva.innerHTML += '<br/>';
+
+                    contenedorToastNueva.innerHTML += '<div id="toastNueva" class="toast align-items-center text-white bg-primary border-0 w-100" role="alert" aria-live="assertive" aria-atomic="true"><div class="d-flex"><div class="toast-body">Se ha guardado correctamente</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div></div>';
+
+
+
+                    var options = { animation: true, delay: 4000 };
+                    var toast = new bootstrap.Toast(document.getElementById('toastNueva'), options);
+                    toast.show();
+
+                    LimpiarModalNueva();
+
+                    //guardadoBodyNuevo.innerHTML = 'Se ha guardado correctamente';
+                    //TablaImagenConstancias();
+                }
+                else {
+                    alert(respuesta);
+                    //guardadoBodyNuevo.innerHTML = respuesta;
+                }
+                //$("#guardarNuevo").modal('hide');
+                //$("#guardadoNuevo").modal('show');
+            }
+        }
+    }
+
+
+
+
+    function Modificar(datos) {
+        var myModal = new bootstrap.Modal(document.getElementById('modalModificar'), {});
+        CbTipos(2);
+
+        var arreglo = datos.split('|');
+
+        document.getElementById('txtTituloModificar').value = arreglo[1];
+        document.getElementById('txtDescripcionModificar').value = arreglo[2];
+        document.getElementById('cbTiposModificar').value = arreglo[4];
+
+
+
+
+        myModal.show();
+    }
+
+
+    function Modificado() {
+        var input = document.getElementById('txtImagenNuevo').files;
+
+        if (input.size > 1048576) {
+            alert("El archivo pesa mas de 1 mb");
+            //Swal.fire({
+            //    icon: 'warning',
+            //    title: "El archivo pesa mas de 1 mb.",
+            //    showConfirmButton: false,
+            //    timer: 1500
+            //});
+            return;
+        }
+        var formData = new FormData();
+        $.each(input, function (i, files) {
+            formData.append('Files', files);
+        });
+        formData.append("Titulo", document.getElementById("txtTituloNuevo").value);
+        formData.append("Descripcion", document.getElementById("txtDescripcionNuevo").value);
+        formData.append("IdTipo", document.getElementById("cbTiposNuevo").value);
+
+        const http = new XMLHttpRequest();
+        http.open('POST', url + '/Publicacion/Guardar');
+        http.send(formData);
+        http.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var respuesta = this.responseText;
+                //let guardadoBodyNuevo = document.querySelector('#guardadoBodyNuevo');
+                if (respuesta == 'Ok') {
+                    alert('Se ha guardado correctamente');
+                    //guardadoBodyNuevo.innerHTML = 'Se ha guardado correctamente';
+                    //TablaImagenConstancias();
+                }
+                else {
+                    alert(respuesta);
+                    //guardadoBodyNuevo.innerHTML = respuesta;
+                }
+                //$("#guardarNuevo").modal('hide');
+                //$("#guardadoNuevo").modal('show');
+            }
+        }
+    }
+
+
+
+
+    function VerDetalles(datosDetalle) {
+
+        var modalDetalles = new bootstrap.Modal(document.getElementById('modalDetalles'), {});
+        var arreglo = datosDetalle.split('|');
+        var arregloImagenes = arreglo[3].split(',');
+
+        var dTitulo = document.getElementById('dTitulo');
+        var dDescripcion = document.getElementById('dDescripcion');
+        var dCarouselIndicators = document.getElementById('carouselIndicators');
+        var dImagenes = document.getElementById('carousel');
+
+        var dAnteriorSiguiente = document.getElementById('dAnteriorSiguiente');
+
+        dCarouselIndicators.innerHTML = '';
+        dImagenes.innerHTML = '';
+        dAnteriorSiguiente.innerHTML = '';
+
+        console.log(arregloImagenes);
+
+        dTitulo.innerHTML = arreglo[1];
+        dDescripcion.innerHTML = arreglo[2];
+        var index = 0;
+
+        for (let imagen of arregloImagenes) {
+            if (index < 1) {
+                dImagenes.innerHTML += '<div class="carousel-item active"><img src="' + imagen + '" class="d-block w-100" alt="..."></div>';
+                dCarouselIndicators.innerHTML += '<li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="' + index + '" class="active"></li>';
+            } else {
+                dImagenes.innerHTML += '<div class="carousel-item"><img src="' + imagen + '" class="d-block w-100" alt="..."></div>';
+                dCarouselIndicators.innerHTML += '<li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="' + index + '"></li>';
+            }
+            index++;
+        }
+
+        dAnteriorSiguiente.innerHTML += '<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></a><a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></a>';
+
+
+
+
+        modalDetalles.show();
+        //' + item.Id + ' | ' + item.Titulo + ' | ' + item.Descripcion + ' | ' + item.Imagen + ' | ' + item.IdTipo + ' | ' + item.NombreTipo + '
+    }
+
+    function CardsTipos() {
+        const xhttp = new XMLHttpRequest();
+        xhttp.open('GET', url + '/Publicacion/CardsPublicacion?idTipo=' + document.getElementById('cbTipos').value, true);
+        //xhttp.open('GET', '/Alumno/ListaModificarAlumno?TextoBuscar=' + textoBuscar, true);
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                let d = JSON.parse(this.responseText);
+                let contenedorCards = document.querySelector('#ContenedorCards');
+                contenedorCards.innerHTML = '';
+                let imagenes = [];
+                for (let item of d) {
+                    imagenes = JSON.parse(item.Imagen);
+                    contenedorCards.innerHTML += '<div class="col"><div class="card h-100"><img src="' + imagenes[0] + '" class="card-img-top" alt="..."><div class="card-body"><h5 class="card-title">' + item.Titulo + '</h5><p class="card-text">' + item.Descripcion + '</p></div><div style="display: flex; justify-content: center; align-items: center;" class="card-footer"><button class="btn btn-primary" id="' + item.Id + '|' + item.Titulo + '|' + item.Descripcion + '|' + imagenes + '|' + item.IdTipo + '|' + item.NombreTipo + '" onclick="VerDetalles(this.id);">Ver detalles</button><button style="margin-left:4px;" class="btn btn-success" id="' + item.Id + '|' + item.Titulo + '|' + item.Descripcion + '|' + imagenes + '|' + item.IdTipo + '|' + item.NombreTipo + '" onclick="Modificar(this.id);">Modificar</button><button style="margin-left:4px;" class="btn btn-danger">Borrar</button></div></div></div>';
+                }
+            }
+        }
+    }
+</script>

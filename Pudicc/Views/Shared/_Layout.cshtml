@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Mi aplicación ASP.NET</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css">
+</head>
+<body>
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Pudicc</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Pricing</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Menú
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <li><a class="dropdown-item" href="/Usuario/Proyectos">Proyectos</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <span class="navbar-text ms-auto" id="spanNombre">
+
+                </span>
+                <span class="navbar-text ms-auto" id="spanIniciarSesion">
+                    <a class="nav-link" href="/Usuario/IniciarSesion">Iniciar Sesión</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Pudicc</p>
+        </footer>
+    </div>
+
+    <script>
+        window.onload = CargarPagina();
+        function CargarPagina() {
+            NombreUsuario();
+        }
+        function NombreUsuario() {
+            var nombre = sessionStorage.getItem('Nombre');
+            if (nombre != null) {
+                document.getElementById('spanNombre').innerHTML = nombre;
+                document.getElementById('spanNombre').style.display = 'block';
+                document.getElementById('spanIniciarSesion').style.display = 'none';
+            } else {
+                document.getElementById('spanNombre').innerHTML = '';
+                document.getElementById('spanNombre').style.display = 'none';
+                document.getElementById('spanIniciarSesion').style.display = 'block';
+            }
+        }
+    </script>
+
+
+
+    <script src="~/Content/bootstrap.bundle.min.js"></script>
+    @*<script src="~/Content/popper.min.js"></script>
+        <script src="~/Content/bootstrap.min.js"></script>*@
+</body>
+</html>

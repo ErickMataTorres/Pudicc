@@ -1,0 +1,82 @@
+﻿
+@{
+    ViewBag.Title = "IniciarSesion";
+}
+
+<div class="container col-xl-10 col-xxl-8 px-4 py-5">
+    <div class="row align-items-center g-lg-5 py-5">
+        <div class="col-lg-7 text-center text-lg-start">
+            <h1 class="display-4 fw-bold lh-1 mb-3">Bienvenido</h1>
+            @*<p class="col-lg-10 fs-4">Below is an example form built entirely with Bootstrap’s form controls. Each required form group has a validation state that can be triggered by attempting to submit the form without completing it.</p>*@
+        </div>
+        <div class="col-md-10 mx-auto col-lg-5">
+            <div class="p-4 p-md-5 border rounded-3 bg-light">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="txtUsuario" placeholder="...">
+                    <label for="txtUsuario">Usuario</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="txtContrasena" placeholder="...">
+                    <label for="txtContrasena">Contraseña</label>
+                </div>
+                @*<div class="checkbox mb-3">
+                    <label>
+                        <input type="checkbox" value="remember-me"> Recuerdame
+                    </label>
+                </div>*@
+                <button class="w-100 btn btn-lg btn-primary" id="btnIniciar" onclick="ValidarLogin();">Iniciar Sesión</button>
+                <hr class="my-4">
+                @*<small class="text-muted">By clicking Sign up, you agree to the terms of use.</small>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<style>
+    .centrar {
+        margin: 0 auto;
+        width: 30%;
+        padding: 20px;
+    }
+</style>
+<h1 style="text-align:center;">Iniciar sesión</h1>
+
+<div class="centrar">
+    <input type="text" class="form-control" placeholder="Usuario" id="txtUsuario"/>
+    <br />
+    <input type="password" class="form-control" placeholder="Contraseña" id="txtContrasena"/>
+    <br />
+    <button class="btn btn-primary" id="btnIniciar" onclick="ValidarLogin();">Iniciar sesión</button>
+</div>*@
+
+<script>
+    var url = 'https://localhost:44357';
+    //var url = 'http://practicaraplicaciones.somee.com';
+    window.onload = CargarPagina();
+    function CargarPagina() {
+
+    }
+    function ValidarLogin() {
+        var usuario = document.getElementById('txtUsuario').value;
+        var contrasena = document.getElementById('txtContrasena').value;
+        const xhttp = new XMLHttpRequest();
+        xhttp.open('GET', url + '/Usuario/Login?usuario=' + usuario + "&contrasena=" + contrasena, true);
+        //xhttp.open('GET', '/Busqueda/ListaAlumno?Matricula=' + matricula, true);
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                let respuesta = JSON.parse(this.responseText);
+                if (respuesta.Id != 0) {
+                    sessionStorage.setItem('Id', respuesta.Id);
+                    sessionStorage.setItem('Nombre', respuesta.Nombre);
+                    alert('Bienvenido');
+                    location.href = '/Usuario/Proyectos';
+                }
+                else {
+                    alert('Usuario o contraseña incorrecto');
+                }
+            }
+        }
+    }
+</script>
+
